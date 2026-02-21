@@ -1,11 +1,13 @@
 import express from "express"
 import { parse } from "tinyduration"
+import { join } from "path"
 
 const app = express()
 const port = 3000
 
 app.get("/", (_, res) => {
-	res.sendFile("index.html", { root: "public" })
+	const filePath = join(process.cwd(), "public", "index.html")
+	res.sendFile(filePath)
 })
 
 const VIDEO_NOT_FOUND_ERR = {

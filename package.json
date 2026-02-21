@@ -1,0 +1,16 @@
+{
+  "name": "mediashare-calculator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "perpetuareality",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.2.1",
+    "tinyduration": "^3.4.1"
+  }
+}

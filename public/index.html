@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Mediashare Calculator</title>
+
+		<style>
+			* {
+				box-sizing: border-box;
+
+				font-family: Verdana, Geneva, Tahoma, sans-serif;
+			}
+
+			body,
+			html {
+				background-color: #313131;
+				color: white;
+				font-size: large;
+				text-align: center;
+
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+
+			div {
+				max-width: 20rem;
+				width: 100%;
+			}
+
+			input,
+			button {
+				background-color: #525252;
+				color: white;
+				font-size: large;
+				text-align: center;
+
+				border: none;
+				margin: 2px;
+				padding: 2px;
+
+				&:hover {
+					background-color: #808080;
+				}
+			}
+
+			section > input,
+			section > button {
+				width: 100%;
+			}
+
+			input[type="number"] {
+				width: 5rem;
+			}
+
+			button {
+				cursor: pointer;
+			}
+
+			.error {
+				color: rgb(255, 109, 109);
+			}
+
+			.success {
+				color: white;
+			}
+		</style>
+	</head>
+
+	<body>
+		<section>
+			<input id="videoID" placeholder="Your video ID here" />
+			<div>
+				Cost per second: $
+				<input
+					id="costPerSecond"
+					type="number"
+					value="0.05"
+					step="0.01"
+				/>
+			</div>
+			<div>
+				Minimum: $
+				<input id="minimum" type="number" value="3" step="0.01" />
+			</div>
+			<button onclick="resetCosts()">Reset costs</button>
+			<button onclick="calculate()">Calculate!</button>
+		</section>
+
+		<section id="results" style="margin-top: 1rem"></section>
+
+		<script>
+			const idField = document.getElementById("videoID")
+			const costPerSecondField = document.getElementById("costPerSecond")
+			const minimumField = document.getElementById("minimum")
+			const resultsSection = document.getElementById("results")
+
+			resetCosts()
+
+			function resetCosts() {
+				costPerSecondField.value = 0.05
+				minimumField.value = 3
+			}
+
+			function calculate() {
+				const videoID = idField.value
+				fetch("/videoLength/" + videoID)
+					.then((res) => res.json())
+					.then((body) => {
+						if (body.error) {
+							resultsSection.className = "error"
+							resultsSection.textContent = "ERROR! " + body.error
+						} else {
+							const costPerSecond = costPerSecondField.value
+							const minimum = minimumField.value
+							const rawVideoCost = body.duration * costPerSecond
+							const videoCost =
+								rawVideoCost < minimum ? minimum : rawVideoCost
+
+							resultsSection.className = "success"
+							resultsSection.textContent = `Your video is ${body.duration} seconds long!\nIt would cost AT LEAST ${new Intl.NumberFormat(
+								"us-US",
+								{ style: "currency", currency: "USD" },
+							).format(videoCost)}`
+						}
+					})
+			}
+		</script>
+	</body>
+</html>

@@ -23,7 +23,8 @@ const SECONDS_IN_A_MINUTE = 60
 
 app.get("/videoLength/:id", (req, res) => {
 	const videoID = req.params.id
-	if (videoID.length !== 11) return res.status(400).send(VIDEO_NOT_FOUND_ERR)
+	if (!videoID.match(/[A-z0-9\-_]*/g) || videoID.length !== 11)
+		return res.status(400).send(VIDEO_NOT_FOUND_ERR)
 
 	fetch(
 		`https://www.googleapis.com/youtube/v3/videos?id=${videoID}&key=${process.env.YOUTUBE_KEY}&part=contentDetails&fields=items(contentDetails/duration)`,

@@ -105,6 +105,17 @@
 
 			function calculate() {
 				const videoID = idField.value
+				if (
+					!videoID ||
+					!videoID.match(/[A-z0-9\-_]*/g) ||
+					videoID.length !== 11
+				) {
+					resultsSection.className = "error"
+					resultsSection.textContent =
+						'ERROR! Please input a valid video ID! (Just the part after "?v=")'
+				}
+
+				resultsSection.textContent = "Fetching..."
 				fetch("/videoLength/" + videoID)
 					.then((res) => res.json())
 					.then((body) => {

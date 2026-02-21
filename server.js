@@ -27,6 +27,11 @@ app.get("/videoLength/:id", (req, res) => {
 
 	fetch(
 		`https://www.googleapis.com/youtube/v3/videos?id=${videoID}&key=${process.env.YOUTUBE_KEY}&part=contentDetails&fields=items(contentDetails/duration)`,
+		{
+			headers: {
+				Referer: process.env.HOST_DOMAIN,
+			},
+		},
 	)
 		.then((res) => res.json())
 		.then((body) => {

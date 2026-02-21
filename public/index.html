@@ -98,6 +98,14 @@
 
 			resetCosts()
 
+			function validateVideoID(candidate) {
+				return (
+					candidate &&
+					candidate.length === 11 &&
+					candidate.match(/^[A-z0-9\-_]*$/g)
+				)
+			}
+
 			function resetCosts() {
 				costPerSecondField.value = 0.05
 				minimumField.value = 3
@@ -105,11 +113,7 @@
 
 			function calculate() {
 				const videoID = idField.value
-				if (
-					!videoID ||
-					!videoID.match(/[A-z0-9\-_]*/g) ||
-					videoID.length !== 11
-				) {
+				if (!validateVideoID(videoID)) {
 					resultsSection.className = "error"
 					resultsSection.textContent =
 						'ERROR! Please input a valid video ID! (Just the part after "?v=")'

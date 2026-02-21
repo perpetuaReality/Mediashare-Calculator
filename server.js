@@ -23,7 +23,7 @@ const SECONDS_IN_A_MINUTE = 60
 
 app.get("/videoLength/:id", (req, res) => {
 	const videoID = req.params.id
-	if (!videoID.match(/[A-z0-9\-_]*/g) || videoID.length !== 11)
+	if (!validateVideoID(videoID))
 		return res.status(400).send(VIDEO_NOT_FOUND_ERR)
 
 	fetch(
@@ -64,3 +64,11 @@ app.get("/videoLength/:id", (req, res) => {
 app.listen(port, () => {
 	console.log(`Mediashare calculator listening on port ${port}`)
 })
+
+function validateVideoID(candidate) {
+	return (
+		candidate &&
+		candidate.length === 11 &&
+		candidate.match(/^[A-z0-9\-_]*$/g)
+	)
+}

@@ -7,7 +7,7 @@ const port = 3000
 app.use(express.static("public"))
 
 app.get("/", (req, res) => {
-	res.sendFile("index.html")
+	res.sendFile("/index.html")
 })
 
 const VIDEO_NOT_FOUND_ERR = {

@@ -58,6 +58,11 @@
 				cursor: pointer;
 			}
 
+			.suspense {
+				color: #808080;
+				font-style: italic;
+			}
+
 			.error {
 				color: rgb(255, 109, 109);
 			}
@@ -120,6 +125,7 @@
 					return
 				}
 
+				resultsSection.className = "suspense"
 				resultsSection.textContent = "Fetching..."
 				fetch("/videoLength/" + videoID)
 					.then((res) => res.json())

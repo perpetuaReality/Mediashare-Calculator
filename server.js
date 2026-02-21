@@ -10,6 +10,9 @@ app.get("/", (_, res) => {
 	res.sendFile(filePath)
 })
 
+const INVALID_VIDEO_ID_ERR = {
+	error: 'Please input a valid video ID! (Just the part after "?v=")',
+}
 const VIDEO_NOT_FOUND_ERR = {
 	error: "Couldn't find that video! Please check the ID.",
 }
@@ -24,7 +27,7 @@ const SECONDS_IN_A_MINUTE = 60
 app.get("/videoLength/:id", (req, res) => {
 	const videoID = req.params.id
 	if (!validateVideoID(videoID))
-		return res.status(400).send(VIDEO_NOT_FOUND_ERR)
+		return res.status(400).send(INVALID_VIDEO_ID_ERR)
 
 	fetch(
 		`https://www.googleapis.com/youtube/v3/videos?id=${videoID}&key=${process.env.YOUTUBE_KEY}&part=contentDetails&fields=items(contentDetails/duration)`,

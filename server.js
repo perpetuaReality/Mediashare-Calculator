@@ -4,8 +4,6 @@ import { parse } from "tinyduration"
 const app = express()
 const port = 3000
 
-process.loadEnvFile(".env")
-
 app.use(express.static("public"))
 
 app.get("/", (req, res) => {

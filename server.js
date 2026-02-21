@@ -4,10 +4,8 @@ import { parse } from "tinyduration"
 const app = express()
 const port = 3000
 
-app.use(express.static("public"))
-
-app.get("/", (req, res) => {
-	res.sendFile("/index.html")
+app.get("/", (_, res) => {
+	res.sendFile("index.html", { root: "." })
 })
 
 const VIDEO_NOT_FOUND_ERR = {

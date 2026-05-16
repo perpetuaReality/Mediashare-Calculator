@@ -35,7 +35,7 @@ const limiter = rateLimit({
 	message: buildError(ERRORS.RATE_LIMIT),
 	// store: ... , // Redis, Memcached, etc. Using in-memory for now.
 })
-app.get("/api/videoLength/:id", limiter, (req, res) => {
+app.get("/videoLength/:id", limiter, (req, res) => {
 	const videoID = req.params.id
 	if (!validateVideoID(videoID))
 		return res.status(400).send(buildError(ERRORS.INVALID_VIDEO_ID))

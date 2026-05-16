@@ -3,12 +3,16 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link
+			rel="shortcut icon"
+			type="image/png"
+			href="https://perpetuareality.com/favicon.png"
+		/>
 		<title>Mediashare Calculator</title>
 
 		<style>
 			* {
 				box-sizing: border-box;
-
 				font-family: Verdana, Geneva, Tahoma, sans-serif;
 			}
 
@@ -24,9 +28,19 @@
 				align-items: center;
 			}
 
-			div {
+			div,
+			section {
 				max-width: 20rem;
 				width: 100%;
+			}
+
+			#settingsButtons {
+				display: flex;
+				flex-direction: row;
+
+				button {
+					width: 50%;
+				}
 			}
 
 			input,
@@ -48,6 +62,11 @@
 			section > input,
 			section > button {
 				width: 100%;
+			}
+
+			#calculateButton {
+				font-size: x-large;
+				font-weight: bold;
 			}
 
 			input[type="number"] {
@@ -81,12 +100,17 @@
 					color: white;
 				}
 			}
+
+			#changelog {
+				text-align: left;
+				font-size: 0.8rem;
+			}
 		</style>
 	</head>
 
 	<body>
 		<section>
-			<input id="videoID" placeholder="Your video ID here" />
+			<input id="videoID" placeholder="Your video URL or ID here" />
 			<div>
 				Cost per second: $
 				<input
@@ -100,69 +124,44 @@
 				Minimum: $
 				<input id="minimum" type="number" value="3" step="0.01" />
 			</div>
-			<button onclick="resetCosts()">Reset costs</button>
-			<button onclick="calculate()">Calculate!</button>
+			<div id="settingsButtons">
+				<button id="resetButton">Reset costs</button>
+				<button id="copyLinkButton">Copy link with settings</button>
+			</div>
+			<button id="calculateButton">Calculate!</button>
 		</section>
 
 		<section id="results" style="margin-top: 1rem"></section>
+		<template id="videoInformationTemplate">
+			Your video is <i id="duration"></i> seconds long!<br />
+			It would cost AT LEAST <b id="cost"></b>
+		</template>
 
 		<footer>
-			Made by <a href="https://perpetuareality.com">perpetuareality</a>.
+			Made by
+			<a href="https://perpetuareality.com">perpetuareality</a>.<br />
+			With NO Artificial "Intelligence."
 		</footer>
 
-		<script>
-			const idField = document.getElementById("videoID")
-			const costPerSecondField = document.getElementById("costPerSecond")
-			const minimumField = document.getElementById("minimum")
-			const resultsSection = document.getElementById("results")
+		<section id="changelog">
+			<h2>Changelog</h2>
+			<h3>May 16th, 2026</h3>
+			<ul>
+				<li>
+					Added ability to use full video URLs instead of video IDs
+					for input.
+				</li>
+				<li>Added some more formatting to output.</li>
+				<li>
+					Added ability to load and save cost constants (cost per
+					second and pay minimum) to URL.
+				</li>
+				<li>Some backend/infrastructure changes.</li>
+				<li>Some small styling changes.</li>
+				<li>Added favicon.</li>
+			</ul>
+		</section>
 
-			resetCosts()
-
-			function validateVideoID(candidate) {
-				return (
-					candidate &&
-					candidate.length === 11 &&
-					candidate.match(/^[A-z0-9\-_]*$/)
-				)
-			}
-
-			function resetCosts() {
-				costPerSecondField.value = 0.05
-				minimumField.value = 3
-			}
-
-			function calculate() {
-				const videoID = idField.value
-				if (!validateVideoID(videoID)) {
-					resultsSection.className = "error"
-					resultsSection.textContent =
-						'ERROR! Please input a valid video ID! (Just the part after "?v=")'
-					return
-				}
-
-				resultsSection.className = "suspense"
-				resultsSection.textContent = "Fetching..."
-				fetch("/videoLength/" + videoID)
-					.then((res) => res.json())
-					.then((body) => {
-						if (body.error) {
-							resultsSection.className = "error"
-							resultsSection.textContent = "ERROR! " + body.error
-						} else {
-							const costPerSecond = costPerSecondField.value
-							const minimum = minimumField.value
-							const rawVideoCost = body.duration * costPerSecond
-							const videoCost =
-								rawVideoCost < minimum ? minimum : rawVideoCost
-
-							resultsSection.className = "success"
-							resultsSection.textContent = `Your video is ${body.duration} seconds long!\nIt would cost AT LEAST ${new Intl.NumberFormat(
-								"us-US",
-								{ style: "currency", currency: "USD" },
-							).format(videoCost)}`
-						}
-					})
-			}
-		</script>
+		<script type="module" src="script.js"></script>
 	</body>
 </html>

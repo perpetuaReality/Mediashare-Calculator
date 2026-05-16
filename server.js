@@ -1,33 +1,31 @@
 import express from "express"
 import { parse } from "tinyduration"
 import { join } from "path"
+import { validateVideoID } from "./shared/util.js"
 
 const app = express()
 const port = 3000
 
-app.get("/", (_, res) => {
-	const filePath = join(process.cwd(), "public", "index.html")
-	res.sendFile(filePath)
-})
+process.loadEnvFile(".env")
 
-const INVALID_VIDEO_ID_ERR = {
-	error: 'Please input a valid video ID! (Just the part after "?v=")',
-}
-const VIDEO_NOT_FOUND_ERR = {
-	error: "Couldn't find that video! Please check the ID.",
-}
-const AUTHORIZATION_ERR = {
-	error: "An authorization error occurred! Please contact Perp.",
-}
+/* === ROUTING === */
+app.use("/", express.static("public"))
+app.use("/shared", express.static("shared"))
 
+/* === VIDEO LENGTH FETCH === */
 const SECONDS_IN_A_DAY = 60 * 60 * 24
 const SECONDS_IN_AN_HOUR = 60 * 60
 const SECONDS_IN_A_MINUTE = 60
-
+const ERRORS = {
+	INVALID_VIDEO_ID:
+		'Please input a valid video ID! (Just the part after "?v=")',
+	VIDEO_NOT_FOUND: "Couldn't find that video! Please check the ID.",
+	AUTHORIZATION: "An authorization error occurred! Please contact Perp.",
+}
 app.get("/videoLength/:id", (req, res) => {
 	const videoID = req.params.id
 	if (!validateVideoID(videoID))
-		return res.status(400).send(INVALID_VIDEO_ID_ERR)
+		return res.status(400).send(buildError(ERRORS.INVALID_VIDEO_ID))
 
 	fetch(
 		`https://www.googleapis.com/youtube/v3/videos?id=${videoID}&key=${process.env.YOUTUBE_KEY}&part=contentDetails&fields=items(contentDetails/duration)`,
@@ -41,7 +39,9 @@ app.get("/videoLength/:id", (req, res) => {
 		.then((body) => {
 			if (!body.error?.code) {
 				if (!body.items.length)
-					return res.status(400).send(VIDEO_NOT_FOUND_ERR)
+					return res
+						.status(400)
+						.send(buildError(ERRORS.VIDEO_NOT_FOUND))
 
 				const videoDuration = body.items[0].contentDetails.duration
 				const durationParts = parse(videoDuration)
@@ -57,21 +57,19 @@ app.get("/videoLength/:id", (req, res) => {
 			switch (body.error.code) {
 				case 400:
 				case 404:
-					res.status(400).send(VIDEO_NOT_FOUND_ERR)
+					res.status(400).send(buildError(ERRORS.VIDEO_NOT_FOUND))
 				case 403:
-					res.status(400).send(AUTHORIZATION_ERR)
+					res.status(400).send(buildError(ERRORS.AUTHORIZATION))
 			}
 		})
 })
 
+/* === START SERVER === */
 app.listen(port, () => {
 	console.log(`Mediashare calculator listening on port ${port}`)
 })
 
-function validateVideoID(candidate) {
-	return (
-		candidate &&
-		candidate.length === 11 &&
-		candidate.match(/^[A-z0-9\-_]*$/g)
-	)
+/* === SERVER-SIDE UTILS === */
+function buildError(message) {
+	return { error: message }
 }

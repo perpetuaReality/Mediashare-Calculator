@@ -11,6 +11,9 @@ process.loadEnvFile(".env")
 
 /* === ROUTING === */
 app.use("/", express.static("public"))
+app.get("/", function (req, res) {
+	res.sendFile(path.resolve("public/index.html"))
+})
 app.use("/shared", express.static("shared"))
 
 /* === VIDEO LENGTH FETCH === */

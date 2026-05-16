@@ -103,7 +103,7 @@ function calculate() {
 
 	resultsSection.className = MESSAGE_STYLES.SUSPENSE
 	resultsSection.textContent = "Fetching..."
-	fetch("/videoLength/" + videoID)
+	fetch("/api/videoLength/" + videoID)
 		.then((res) => res.json())
 		.then((body) => {
 			if (body.error) {

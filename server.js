@@ -1,6 +1,7 @@
 import express from "express"
 import { parse } from "tinyduration"
 import { join } from "path"
+import { rateLimit } from "express-rate-limit"
 import { validateVideoID } from "./shared/util.js"
 
 const app = express()
@@ -21,8 +22,20 @@ const ERRORS = {
 		'Please input a valid video ID! (Just the part after "?v=")',
 	VIDEO_NOT_FOUND: "Couldn't find that video! Please check the ID.",
 	AUTHORIZATION: "An authorization error occurred! Please contact Perp.",
+	RATE_LIMIT: "Too many requests (heh)! Please try again later.",
 }
-app.get("/videoLength/:id", (req, res) => {
+/* == RATE LIMITING == */
+// Yes, these values are lifted directly from the documentation lol. If it ain't broke...
+const limiter = rateLimit({
+	windowMs: 15 * 60 * 1000, // 15 minutes
+	limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
+	standardHeaders: "draft-8", // draft-6: `RateLimit-*` headers; draft-7 & draft-8: combined `RateLimit` header
+	legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
+	ipv6Subnet: 56, // Set to 60 or 64 to be less aggressive, or 52 or 48 to be more aggressive,
+	message: buildError(ERRORS.RATE_LIMIT),
+	// store: ... , // Redis, Memcached, etc. Using in-memory for now.
+})
+app.get("/api/videoLength/:id", limiter, (req, res) => {
 	const videoID = req.params.id
 	if (!validateVideoID(videoID))
 		return res.status(400).send(buildError(ERRORS.INVALID_VIDEO_ID))

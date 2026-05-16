@@ -1,4 +1,4 @@
-import { validateVideoID, formatCurrency } from "/shared/util.js"
+import { validateVideoID, formatCurrency } from "./shared/util.js"
 
 const MESSAGE_STYLES = {
 	SUSPENSE: "suspense",
@@ -103,7 +103,7 @@ function calculate() {
 
 	resultsSection.className = MESSAGE_STYLES.SUSPENSE
 	resultsSection.textContent = "Fetching..."
-	fetch("/videoLength/" + videoID)
+	fetch("videoLength/" + videoID)
 		.then((res) => res.json())
 		.then((body) => {
 			if (body.error) {
